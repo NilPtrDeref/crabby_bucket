@@ -14,15 +14,16 @@ constexpr int RADIUS = 20;
 constexpr double MIN_CLAW_Y = 150.0f;
 constexpr double MAX_CLAW_Y = WINDOW_HEIGHT - 150.0f;
 constexpr double CLAW_SPEED = 0.5f;
+constexpr Uint32 CLAW_INTERVAL_MS = 850;
 constexpr double GAP_SIZE = 130.0f;
 
-class Rectangle {
+class Claw {
 public:
     double x, y;
     double width, height;
     double speed;
 
-    static Rectangle Random(double vel) {
+    static Claw Random(double vel) {
         double ypos = rand() % WINDOW_HEIGHT;
         if (ypos < MIN_CLAW_Y) {
             ypos = MIN_CLAW_Y;
@@ -30,7 +31,7 @@ public:
         if (ypos > MAX_CLAW_Y) {
             ypos = MAX_CLAW_Y;
         }
-        return Rectangle{
+        return Claw{
             static_cast<double>(WINDOW_WIDTH),
             ypos,
             static_cast<double>(WINDOW_HEIGHT / 10),
@@ -50,10 +51,21 @@ public:
     }
 };
 
+Uint32 CreateClaw(Uint32 interval, void* param) {
+    auto* claws = static_cast<std::vector<Claw>*>(param);
+    const Claw r = Claw::Random(CLAW_SPEED);
+    claws->push_back(r);
+    claws->push_back(Claw{r.x, 0.0f, r.width, (WINDOW_HEIGHT-r.height)-GAP_SIZE, CLAW_SPEED});
+    return interval;
+}
+
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window = SDL_CreateWindow("Crabby Bucket", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    std::vector<Claw> claws;
+    SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
 
     double x = 100;
     double y = static_cast<double>(WINDOW_HEIGHT) / 2;
@@ -61,7 +73,6 @@ int main() {
     Uint64 frame_start = SDL_GetPerformanceCounter();
     double speed = INITIAL_SPEED;
 
-    std::vector<Rectangle> rectangles;
 
     SDL_Event event;
     bool running = true;
@@ -78,13 +89,6 @@ int main() {
             }
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_SPACE) speed = JUMP_SPEED;
-                break;
-            }
-            case SDL_MOUSEBUTTONDOWN: {
-                // TODO: Move this out to something else. Automated system.
-                Rectangle r = Rectangle::Random(CLAW_SPEED);
-                rectangles.push_back(r);
-                rectangles.push_back(Rectangle{r.x, 0.0f, r.width, (WINDOW_HEIGHT-r.height)-GAP_SIZE, CLAW_SPEED});
                 break;
             }
             default: break;
@@ -108,13 +112,13 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for (Rectangle& rect: rectangles) {
+        for (Claw& rect: claws) {
             rect.Draw(renderer);
             rect.Move(frame_delta);
         }
-        rectangles.erase(std::remove_if(rectangles.begin(), rectangles.end(), [](const Rectangle& rect) {
+        claws.erase(std::remove_if(claws.begin(), claws.end(), [](const Claw& rect) {
             return rect.x + rect.width < 0;
-        }), rectangles.end());
+        }), claws.end());
 
         // Draw the circle at the (x, y) coordinates
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -129,6 +133,7 @@ int main() {
         SDL_RenderPresent(renderer);
     }
 
+    SDL_RemoveTimer(claw_timer_id);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
