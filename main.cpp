@@ -16,6 +16,7 @@ constexpr double MAX_CLAW_Y = WINDOW_HEIGHT - 150.0f;
 constexpr double CLAW_SPEED = 0.5f;
 constexpr Uint32 CLAW_INTERVAL_MS = 850;
 constexpr double GAP_SIZE = 130.0f;
+constexpr double PLAYER_COLUMN = 100.0f;
 
 class Claw {
 public:
@@ -59,6 +60,12 @@ Uint32 CreateClaw(Uint32 interval, void* param) {
     return interval;
 }
 
+// TODO: Collision
+// TODO: Score
+// TODO: Game loop? (Menu, Gameover screen, Pause menu?)
+// TODO: Art?
+// TODO: Animations on claws?
+// TODO: Rotation for crab based on speed?
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window = SDL_CreateWindow("Crabby Bucket", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
@@ -67,7 +74,7 @@ int main() {
     std::vector<Claw> claws;
     SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
 
-    double x = 100;
+    double x = PLAYER_COLUMN;
     double y = static_cast<double>(WINDOW_HEIGHT) / 2;
 
     Uint64 frame_start = SDL_GetPerformanceCounter();
