@@ -7,6 +7,14 @@
 constexpr int WINDOW_WIDTH = 768;
 constexpr int WINDOW_HEIGHT = 768;
 constexpr double DOWNWARD_ACCELERATION = 0.002f;
+constexpr double JUMP_SPEED = -0.8f;
+constexpr double INITIAL_SPEED = 0.5f;
+constexpr double MAX_DOWNWARD_SPEED = 0.9f;
+constexpr int RADIUS = 20;
+constexpr double MIN_CLAW_Y = 150.0f;
+constexpr double MAX_CLAW_Y = WINDOW_HEIGHT - 150.0f;
+constexpr double CLAW_SPEED = 0.5f;
+constexpr double GAP_SIZE = 130.0f;
 
 class Rectangle {
 public:
@@ -14,14 +22,20 @@ public:
     double width, height;
     double speed;
 
-    static Rectangle Random() {
-        const auto ypos = static_cast<double>(rand() % WINDOW_HEIGHT);
+    static Rectangle Random(double vel) {
+        double ypos = rand() % WINDOW_HEIGHT;
+        if (ypos < MIN_CLAW_Y) {
+            ypos = MIN_CLAW_Y;
+        }
+        if (ypos > MAX_CLAW_Y) {
+            ypos = MAX_CLAW_Y;
+        }
         return Rectangle{
             static_cast<double>(WINDOW_WIDTH),
             ypos,
             static_cast<double>(WINDOW_HEIGHT / 10),
             static_cast<double>(WINDOW_HEIGHT) - ypos,
-            0.5f,
+            vel,
         };
     }
 
@@ -43,13 +57,11 @@ int main() {
 
     double x = 100;
     double y = static_cast<double>(WINDOW_HEIGHT) / 2;
-    constexpr int radius = 20;
 
     Uint64 frame_start = SDL_GetPerformanceCounter();
-    double speed = 0.5f; // Move this many pixels per millisecond
+    double speed = INITIAL_SPEED;
 
     std::vector<Rectangle> rectangles;
-    rectangles.push_back(Rectangle::Random());
 
     SDL_Event event;
     bool running = true;
@@ -65,12 +77,14 @@ int main() {
                 break;
             }
             case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_SPACE) speed = -0.8f;
+                if (event.key.keysym.sym == SDLK_SPACE) speed = JUMP_SPEED;
                 break;
             }
             case SDL_MOUSEBUTTONDOWN: {
                 // TODO: Move this out to something else. Automated system.
-                rectangles.push_back(Rectangle::Random());
+                Rectangle r = Rectangle::Random(CLAW_SPEED);
+                rectangles.push_back(r);
+                rectangles.push_back(Rectangle{r.x, 0.0f, r.width, (WINDOW_HEIGHT-r.height)-GAP_SIZE, CLAW_SPEED});
                 break;
             }
             default: break;
@@ -79,14 +93,14 @@ int main() {
 
         // Move y by velocity and check that velocity is not pushing you past the border
         y += static_cast<int>(speed * frame_delta);
-        if (y - radius < 0) {
-            y = 1.0f + radius;
+        if (y - RADIUS < 0) {
+            y = 1.0f + RADIUS;
             speed = 0.0f;
         }
-        if (speed < 0.9f) speed += DOWNWARD_ACCELERATION * frame_delta;
+        if (speed < MAX_DOWNWARD_SPEED) speed += DOWNWARD_ACCELERATION * frame_delta;
 
         // You lose if you go below the bottom border
-        if (y - radius > WINDOW_HEIGHT) {
+        if (y - RADIUS > WINDOW_HEIGHT) {
             running = false;
         }
 
@@ -104,9 +118,9 @@ int main() {
 
         // Draw the circle at the (x, y) coordinates
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        for (int w = -radius; w < radius; w++) {
-            for (int h = -radius; h < radius; h++) {
-                if (w*w + h*h <= radius*radius) {
+        for (int w = -RADIUS; w < RADIUS; w++) {
+            for (int h = -RADIUS; h < RADIUS; h++) {
+                if (w*w + h*h <= RADIUS*RADIUS) {
                     SDL_RenderDrawPoint(renderer, static_cast<int>(x) + w, static_cast<int>(y) + h);
                 }
             }
