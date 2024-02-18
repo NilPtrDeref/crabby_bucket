@@ -52,6 +52,20 @@ public:
     [[nodiscard]] bool ShouldDestroy() const {
         return x + width < 0;
     }
+
+    [[nodiscard]] bool Collides(const double cx, const double cy, const double radius) const {
+        // Calculate the closest point on the rectangle to the center of the circle
+        const double closestX = std::max(x, std::min(cx, x + width));
+        const double closestY = std::max(y, std::min(cy, y + height));
+
+        // Calculate the distance between the closest point and the center of the circle
+        const double distanceX = closestX - cx;
+        const double distanceY = closestY - cy;
+        const double distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+
+        // Check if the distance is less than or equal to the radius of the circle
+        return distanceSquared <= (radius * radius);
+    }
 };
 
 Uint32 CreateClaw(const Uint32 interval, void* param) {
@@ -148,10 +162,8 @@ int main() {
 
         for (Claw& claw: claws) {
             // Check for collision
-            // TODO: Make collision more accurate
-            if (x + RADIUS > claw.x && x - RADIUS < claw.x + claw.width)
-                if (y + RADIUS < claw.y + claw.height && y - RADIUS > claw.y)
-                    running = false;
+            if (claw.Collides(x, y, RADIUS))
+                running = false;
 
             claw.Draw(renderer);
             claw.Move(frame_delta);
