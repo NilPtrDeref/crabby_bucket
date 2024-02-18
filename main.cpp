@@ -27,6 +27,11 @@ public:
     double x, y, radius;
 };
 
+class Rectangle {
+public:
+    double x, y, width, height;
+};
+
 class Player {
 public:
     Circle circ;
@@ -34,8 +39,7 @@ public:
 
 class Claw {
 public:
-    double x, y;
-    double width, height;
+    Rectangle rect;
     double speed;
 
     static Claw Random(const double vel) {
@@ -51,22 +55,22 @@ public:
 
     void Draw(SDL_Renderer* renderer) const {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        const SDL_Rect rect {static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height)};
-        SDL_RenderFillRect(renderer, &rect);
+        const SDL_Rect r {static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width), static_cast<int>(rect.height)};
+        SDL_RenderFillRect(renderer, &r);
     }
 
     void Move(const double delta) {
-        x -= speed * delta;
+        rect.x -= speed * delta;
     }
 
     [[nodiscard]] bool ShouldDestroy() const {
-        return x + width < 0;
+        return rect.x + rect.width < 0;
     }
 
     [[nodiscard]] bool Collides(const Circle c) const {
         // Calculate the closest point on the rectangle to the center of the circle
-        const double closestX = std::max(x, std::min(c.x, x + width));
-        const double closestY = std::max(y, std::min(c.y, y + height));
+        const double closestX = std::max(rect.x, std::min(c.x, rect.x + rect.width));
+        const double closestY = std::max(rect.y, std::min(c.y, rect.y + rect.height));
 
         // Calculate the distance between the closest point and the center of the circle
         const double distanceX = closestX - c.x;
@@ -82,7 +86,7 @@ Uint32 CreateClaw(const Uint32 interval, void* param) {
     auto* claws = static_cast<std::vector<Claw>*>(param);
     const Claw r = Claw::Random(CLAW_SPEED);
     claws->push_back(r);
-    claws->push_back(Claw{r.x, 0.0f, r.width, (WINDOW_HEIGHT-r.height)-GAP_SIZE, CLAW_SPEED});
+    claws->push_back(Claw{r.rect.x, 0.0f, r.rect.width, (WINDOW_HEIGHT-r.rect.height)-GAP_SIZE, CLAW_SPEED});
     return interval;
 }
 
@@ -117,7 +121,7 @@ int main() {
         return 1;
     }
 
-    auto player = Player{ {PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS} };
+    auto player = Player{ PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS };
     std::vector<Claw> claws;
     const SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
 
