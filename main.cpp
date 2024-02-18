@@ -77,9 +77,9 @@ Uint32 CreateClaw(const Uint32 interval, void* param) {
 }
 
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
-// TODO: Art?
-// TODO: Animations on claws?
+// TODO: Art? (Non-moving background. Yellow bucket with sky at the end.)
 // TODO: Rotation for crab based on speed?
+// TODO: Animations on claws?
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "There was an error initializing SDL_video: " << SDL_GetError() << std::endl;
