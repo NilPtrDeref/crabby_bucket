@@ -29,13 +29,7 @@ public:
     double speed;
 
     static Claw Random(const double vel) {
-        double ypos = rand() % WINDOW_HEIGHT;
-        if (ypos < MIN_CLAW_Y) {
-            ypos = MIN_CLAW_Y;
-        }
-        if (ypos > MAX_CLAW_Y) {
-            ypos = MAX_CLAW_Y;
-        }
+        double ypos = lerp(MIN_CLAW_Y + GAP_SIZE, WINDOW_HEIGHT - MIN_CLAW_Y - GAP_SIZE, static_cast<double>(rand()) / RAND_MAX);
         return Claw{
             static_cast<double>(WINDOW_WIDTH),
             ypos,
@@ -68,7 +62,6 @@ Uint32 CreateClaw(const Uint32 interval, void* param) {
     return interval;
 }
 
-// TODO: Collision
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art?
 // TODO: Animations on claws?
@@ -154,9 +147,17 @@ int main() {
         SDL_RenderClear(renderer);
 
         for (Claw& claw: claws) {
+            // Check for collision
+            // TODO: Make collision more accurate
+            if (x + RADIUS > claw.x && x - RADIUS < claw.x + claw.width)
+                if (y + RADIUS < claw.y + claw.height && y - RADIUS > claw.y)
+                    running = false;
+
             claw.Draw(renderer);
             claw.Move(frame_delta);
         }
+
+        // Remove the claws that are off the screen and increment the score
         if (claws.size() > 1) {
             if (claws[0].ShouldDestroy()) {
                 claws.erase(claws.begin());
