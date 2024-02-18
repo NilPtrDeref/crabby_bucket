@@ -22,6 +22,16 @@ constexpr double GAP_SIZE = 130.0f;
 constexpr double PLAYER_COLUMN = 100.0f;
 constexpr SDL_Color SCORE_COLOR = {255, 255, 255, 255};
 
+class Circle {
+public:
+    double x, y, radius;
+};
+
+class Player {
+public:
+    Circle circ;
+};
+
 class Claw {
 public:
     double x, y;
@@ -53,18 +63,18 @@ public:
         return x + width < 0;
     }
 
-    [[nodiscard]] bool Collides(const double cx, const double cy, const double radius) const {
+    [[nodiscard]] bool Collides(const Circle c) const {
         // Calculate the closest point on the rectangle to the center of the circle
-        const double closestX = std::max(x, std::min(cx, x + width));
-        const double closestY = std::max(y, std::min(cy, y + height));
+        const double closestX = std::max(x, std::min(c.x, x + width));
+        const double closestY = std::max(y, std::min(c.y, y + height));
 
         // Calculate the distance between the closest point and the center of the circle
-        const double distanceX = closestX - cx;
-        const double distanceY = closestY - cy;
+        const double distanceX = closestX - c.x;
+        const double distanceY = closestY - c.y;
         const double distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
 
         // Check if the distance is less than or equal to the radius of the circle
-        return distanceSquared <= (radius * radius);
+        return distanceSquared <= (c.radius * c.radius);
     }
 };
 
@@ -107,11 +117,9 @@ int main() {
         return 1;
     }
 
+    auto player = Player{ {PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS} };
     std::vector<Claw> claws;
     const SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
-
-    const double x = PLAYER_COLUMN;
-    double y = static_cast<double>(WINDOW_HEIGHT) / 2;
 
     Uint64 frame_start = SDL_GetPerformanceCounter();
     double speed = INITIAL_SPEED;
@@ -144,15 +152,15 @@ int main() {
         }
 
         // Move y by velocity and check that velocity is not pushing you past the border
-        y += static_cast<int>(speed * frame_delta);
-        if (y - RADIUS < 0) {
-            y = 1.0f + RADIUS;
+        player.circ.y += static_cast<int>(speed * frame_delta);
+        if (player.circ.y - player.circ.radius < 0) {
+            player.circ.y = 1.0f + player.circ.radius;
             speed = 0.0f;
         }
         if (speed < MAX_DOWNWARD_SPEED) speed += DOWNWARD_ACCELERATION * frame_delta;
 
         // You lose if you go below the bottom border
-        if (y - RADIUS > WINDOW_HEIGHT) {
+        if (player.circ.y - player.circ.radius > WINDOW_HEIGHT) {
             running = false;
         }
 
@@ -162,7 +170,7 @@ int main() {
 
         for (Claw& claw: claws) {
             // Check for collision
-            if (claw.Collides(x, y, RADIUS))
+            if (claw.Collides(player.circ))
                 running = false;
 
             claw.Draw(renderer);
@@ -188,10 +196,10 @@ int main() {
 
         // Draw the circle at the (x, y) coordinates
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        for (int w = -RADIUS; w < RADIUS; w++) {
-            for (int h = -RADIUS; h < RADIUS; h++) {
-                if (w*w + h*h <= RADIUS*RADIUS) {
-                    SDL_RenderDrawPoint(renderer, static_cast<int>(x) + w, static_cast<int>(y) + h);
+        for (int w = -player.circ.radius; w < player.circ.radius; w++) {
+            for (int h = -player.circ.radius; h < player.circ.radius; h++) {
+                if (w*w + h*h <= player.circ.radius*player.circ.radius) {
+                    SDL_RenderDrawPoint(renderer, static_cast<int>(player.circ.x) + w, static_cast<int>(player.circ.y) + h);
                 }
             }
         }
