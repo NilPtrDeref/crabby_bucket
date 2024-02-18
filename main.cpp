@@ -1,10 +1,12 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <cstdlib>
 
-constexpr int WINDOW_WIDTH = 768;
+constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
 constexpr double DOWNWARD_ACCELERATION = 0.002f;
 constexpr double JUMP_SPEED = -0.8f;
@@ -13,10 +15,12 @@ constexpr double MAX_DOWNWARD_SPEED = 0.9f;
 constexpr int RADIUS = 20;
 constexpr double MIN_CLAW_Y = 150.0f;
 constexpr double MAX_CLAW_Y = WINDOW_HEIGHT - 150.0f;
+constexpr double CLAW_WIDTH = 50.0f;
 constexpr double CLAW_SPEED = 0.5f;
 constexpr Uint32 CLAW_INTERVAL_MS = 850;
 constexpr double GAP_SIZE = 130.0f;
 constexpr double PLAYER_COLUMN = 100.0f;
+constexpr SDL_Color SCORE_COLOR = {255, 255, 255, 255};
 
 class Claw {
 public:
@@ -24,7 +28,7 @@ public:
     double width, height;
     double speed;
 
-    static Claw Random(double vel) {
+    static Claw Random(const double vel) {
         double ypos = rand() % WINDOW_HEIGHT;
         if (ypos < MIN_CLAW_Y) {
             ypos = MIN_CLAW_Y;
@@ -35,7 +39,7 @@ public:
         return Claw{
             static_cast<double>(WINDOW_WIDTH),
             ypos,
-            static_cast<double>(WINDOW_HEIGHT / 10),
+            CLAW_WIDTH,
             static_cast<double>(WINDOW_HEIGHT) - ypos,
             vel,
         };
@@ -50,9 +54,13 @@ public:
     void Move(const double delta) {
         x -= speed * delta;
     }
+
+    [[nodiscard]] bool ShouldDestroy() const {
+        return x + width < 0;
+    }
 };
 
-Uint32 CreateClaw(Uint32 interval, void* param) {
+Uint32 CreateClaw(const Uint32 interval, void* param) {
     auto* claws = static_cast<std::vector<Claw>*>(param);
     const Claw r = Claw::Random(CLAW_SPEED);
     claws->push_back(r);
@@ -61,25 +69,51 @@ Uint32 CreateClaw(Uint32 interval, void* param) {
 }
 
 // TODO: Collision
-// TODO: Score
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art?
 // TODO: Animations on claws?
 // TODO: Rotation for crab based on speed?
 int main() {
-    SDL_Init(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO)) {
+        std::cerr << "There was an error initializing SDL_video: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+    if (TTF_Init() == -1) {
+        std::cerr << "There was an error initializing SDL_ttf: " << TTF_GetError() << std::endl;
+        return 1;
+    }
+
     SDL_Window* window = SDL_CreateWindow("Crabby Bucket", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    if (window == nullptr) {
+        std::cerr << "There was an error initializing SDL window: " << SDL_GetError() << std::endl;
+        return 1;
+    }
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == nullptr) {
+        std::cerr << "There was an error initializing SDL renderer: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+
+    TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
+    if (font == nullptr) {
+        std::cerr << "There was an error loading the font: " << TTF_GetError() << std::endl;
+        return 1;
+    }
 
     std::vector<Claw> claws;
-    SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
+    const SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, CreateClaw, &claws);
 
-    double x = PLAYER_COLUMN;
+    const double x = PLAYER_COLUMN;
     double y = static_cast<double>(WINDOW_HEIGHT) / 2;
 
     Uint64 frame_start = SDL_GetPerformanceCounter();
     double speed = INITIAL_SPEED;
 
+    unsigned int score = 0;
+    std::string score_text = "0";
+    SDL_Surface* score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
+    SDL_Texture* score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
+    SDL_Rect score_rect = {10, 10, score_surface->w, score_surface->h};
 
     SDL_Event event;
     bool running = true;
@@ -119,13 +153,25 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for (Claw& rect: claws) {
-            rect.Draw(renderer);
-            rect.Move(frame_delta);
+        for (Claw& claw: claws) {
+            claw.Draw(renderer);
+            claw.Move(frame_delta);
         }
-        claws.erase(std::remove_if(claws.begin(), claws.end(), [](const Claw& rect) {
-            return rect.x + rect.width < 0;
-        }), claws.end());
+        if (claws.size() > 1) {
+            if (claws[0].ShouldDestroy()) {
+                claws.erase(claws.begin());
+                claws.erase(claws.begin());
+                score++;
+
+                // Recreate score texture to render only when the score changes
+                SDL_FreeSurface(score_surface);
+                SDL_DestroyTexture(score_texture);
+                score_text = std::to_string(score);
+                score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
+                score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
+                score_rect = {10, 10, score_surface->w, score_surface->h};
+            }
+        }
 
         // Draw the circle at the (x, y) coordinates
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -137,12 +183,17 @@ int main() {
             }
         }
 
+        SDL_RenderCopy(renderer, score_texture, nullptr, &score_rect);
         SDL_RenderPresent(renderer);
     }
 
     SDL_RemoveTimer(claw_timer_id);
+    TTF_CloseFont(font);
+    SDL_FreeSurface(score_surface);
+    SDL_DestroyTexture(score_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
