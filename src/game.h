@@ -16,6 +16,17 @@ class Player {
 public:
     Circle circ;
     double speed;
+
+    void Draw(SDL_Renderer* renderer) const {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        for (int w = -circ.radius; w < circ.radius; w++) {
+            for (int h = -circ.radius; h < circ.radius; h++) {
+                if (w*w + h*h <= circ.radius*circ.radius) {
+                    SDL_RenderDrawPoint(renderer, static_cast<int>(circ.x) + w, static_cast<int>(circ.y) + h);
+                }
+            }
+        }
+    }
 };
 
 class Claw {
@@ -132,16 +143,7 @@ public:
         for (Claw& claw: claws) {
             claw.Draw(renderer);
         }
-
-        // Draw the circle at the (x, y) coordinates
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        for (int w = -player.circ.radius; w < player.circ.radius; w++) {
-            for (int h = -player.circ.radius; h < player.circ.radius; h++) {
-                if (w*w + h*h <= player.circ.radius*player.circ.radius) {
-                    SDL_RenderDrawPoint(renderer, static_cast<int>(player.circ.x) + w, static_cast<int>(player.circ.y) + h);
-                }
-            }
-        }
+        player.Draw(renderer);
 
         // Recreate score texture to render only when the score changes
         if (score_surface != nullptr)

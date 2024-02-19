@@ -58,8 +58,8 @@ int main() {
 
         game->Update(frame_delta);
 
-        // Clear the background to black and then draw the game
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        // Clear the background to white and then draw the game
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
         game->Draw(renderer);
         SDL_RenderPresent(renderer);
