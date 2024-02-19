@@ -32,37 +32,40 @@ int main() {
         return 1;
     }
 
-    // Put main game loop in scope so that variables get deallocated properly
-    {
-        Game game;
-        SDL_Event event;
-        Uint64 frame_start = SDL_GetPerformanceCounter();
-        bool running = true;
-        while (running && game.running) {
-            const Uint64 frame_end = frame_start;
-            frame_start = SDL_GetPerformanceCounter();
-            const double frame_delta = static_cast<double>(frame_start - frame_end) * 1000 / static_cast<double>(SDL_GetPerformanceFrequency());
+    Game* game = new Game;
+    SDL_Event event;
+    Uint64 frame_start = SDL_GetPerformanceCounter();
+    bool running = true;
+    while (running) {
+        const Uint64 frame_end = frame_start;
+        frame_start = SDL_GetPerformanceCounter();
+        const double frame_delta = static_cast<double>(frame_start - frame_end) * 1000 / static_cast<double>(SDL_GetPerformanceFrequency());
 
-            while (SDL_PollEvent(&event)) {
-                switch (event.type) {
-                case SDL_QUIT: {
-                    running = false;
-                    break;
-                }
-                default: game.HandleEvent(event);
-                }
-            }
-
-            game.Update(frame_delta);
-
-            // Clear the background to black and then draw the game
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
-            game.Draw(renderer);
-            SDL_RenderPresent(renderer);
+        if (!game->running) {
+            delete game;
+            game = new Game;
         }
+
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT: {
+                running = false;
+                break;
+            }
+            default: game->HandleEvent(event);
+            }
+        }
+
+        game->Update(frame_delta);
+
+        // Clear the background to black and then draw the game
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        game->Draw(renderer);
+        SDL_RenderPresent(renderer);
     }
 
+    delete game;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();

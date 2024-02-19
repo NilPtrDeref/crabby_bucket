@@ -68,12 +68,13 @@ inline Uint32 Create_claw_pair(const Uint32 interval, void* param) {
     const Claw r = Claw::Random(CLAW_SPEED);
     claws->push_back(r);
     claws->push_back(Claw{r.rect.x, 0.0f, r.rect.width, (WINDOW_HEIGHT-r.rect.height)-GAP_SIZE, CLAW_SPEED});
-    return interval;
+    return CLAW_INTERVAL_MS;
 }
 
 class Game {
 public:
     bool running = true;
+    unsigned int score = 0;
 
     ~Game() {
         SDL_RemoveTimer(claw_timer_id);
@@ -88,12 +89,15 @@ public:
             switch (event.type) {
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_SPACE) player.speed = JUMP_SPEED;
+                if (event.key.keysym.sym == SDLK_ESCAPE) paused = !paused;
                 break;
             }
             default: break;
             }
     }
     void Update(const double frame_delta) {
+        if (paused) return;
+
         // Move y by velocity and check that velocity is not pushing you past the border
         player.circ.y += static_cast<int>(player.speed * frame_delta);
         if (player.circ.y - player.circ.radius < 0) {
@@ -156,9 +160,9 @@ private:
     Player player = Player{ PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS, INITIAL_SPEED};
     std::vector<Claw> claws;
     const SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, Create_claw_pair, &claws);
+    bool paused = false;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
-    unsigned int score = 0;
     std::string score_text = "0";
     SDL_Surface* score_surface = nullptr;
     SDL_Texture* score_texture = nullptr;
