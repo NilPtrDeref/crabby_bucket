@@ -7,7 +7,6 @@
 #include "game.h"
 #include "settings.h"
 
-// TODO: Figure out how to pause timer when pausing game so that claws don't stack up
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art? (Non-moving background. Yellow bucket with sky at the end.)
 // TODO: Rotation for crab based on speed?

@@ -63,21 +63,12 @@ public:
     }
 };
 
-inline Uint32 Create_claw_pair(const Uint32 interval, void* param) {
-    auto* claws = static_cast<std::vector<Claw>*>(param);
-    const Claw r = Claw::Random(CLAW_SPEED);
-    claws->push_back(r);
-    claws->push_back(Claw{r.rect.x, 0.0f, r.rect.width, (WINDOW_HEIGHT-r.rect.height)-GAP_SIZE, CLAW_SPEED});
-    return CLAW_INTERVAL_MS;
-}
-
 class Game {
 public:
     bool running = true;
     unsigned int score = 0;
 
     ~Game() {
-        SDL_RemoveTimer(claw_timer_id);
         TTF_CloseFont(font);
         if (score_surface != nullptr)
             SDL_FreeSurface(score_surface);
@@ -97,6 +88,14 @@ public:
     }
     void Update(const double frame_delta) {
         if (paused) return;
+
+        claw_timer += frame_delta;
+        if (claw_timer > CLAW_INTERVAL_MS) {
+            const Claw r = Claw::Random(CLAW_SPEED);
+            claws.push_back(r);
+            claws.push_back(Claw{r.rect.x, 0.0f, r.rect.width, (WINDOW_HEIGHT-r.rect.height)-GAP_SIZE, CLAW_SPEED});
+            claw_timer = 0.0f;
+        }
 
         // Move y by velocity and check that velocity is not pushing you past the border
         player.circ.y += static_cast<int>(player.speed * frame_delta);
@@ -159,7 +158,7 @@ public:
 private:
     Player player = Player{ PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS, INITIAL_SPEED};
     std::vector<Claw> claws;
-    const SDL_TimerID claw_timer_id = SDL_AddTimer(CLAW_INTERVAL_MS, Create_claw_pair, &claws);
+    double claw_timer = 0.0f;
     bool paused = false;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
