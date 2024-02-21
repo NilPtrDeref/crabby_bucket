@@ -3,6 +3,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "gamestate.h"
 #include "settings.h"
+#include "pause.h"
 
 class Circle {
 public:
@@ -89,15 +90,13 @@ public:
     }
 
     void HandleEvent(Engine *engine, SDL_Event& event) override {
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
-            paused = !paused;
-        }
-
-        if (paused) return;
-
         switch (event.type) {
         case SDL_KEYDOWN: {
             if (event.key.keysym.sym == SDLK_SPACE) player.speed = JUMP_SPEED;
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                GameState* pause = new Pause(this);
+                engine->PushState(pause);
+            }
             break;
         }
         default: break;
@@ -105,8 +104,6 @@ public:
     }
 
     void Update(Engine *engine, double frame_delta) override {
-        if (paused) return;
-
         claw_timer += frame_delta;
         if (claw_timer > CLAW_INTERVAL_MS) {
             const Claw r = Claw::Random(CLAW_SPEED);
@@ -173,7 +170,6 @@ private:
     Player player = Player{ PLAYER_COLUMN, static_cast<double>(WINDOW_HEIGHT) / 2, RADIUS, INITIAL_SPEED};
     std::vector<Claw> claws;
     double claw_timer = 0.0f;
-    bool paused = false;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
     std::string score_text = "0";

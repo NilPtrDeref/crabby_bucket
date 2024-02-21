@@ -26,6 +26,7 @@ int Engine::Init() {
         std::cerr << "There was an error initializing SDL renderer: " << SDL_GetError() << std::endl;
         return 1;
     }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     return 0;
 }

@@ -7,7 +7,8 @@ add_executable(crabby_bucket src/main.cpp
         src/game.cpp
         src/settings.h
         src/engine.cpp
-        src/engine.h)
+        src/engine.h
+        src/pause.cpp)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
