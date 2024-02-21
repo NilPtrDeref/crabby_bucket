@@ -167,8 +167,6 @@ public:
         score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
         score_rect = {10, 10, score_surface->w, score_surface->h};
         SDL_RenderCopy(engine->renderer, score_texture, nullptr, &score_rect);
-
-        SDL_RenderPresent(engine->renderer);
     }
 
 private:

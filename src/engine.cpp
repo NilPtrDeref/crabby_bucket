@@ -84,5 +84,6 @@ void Engine::Update() {
 void Engine::Draw() {
     GameState *current = states.back();
     current->Draw(this);
+    SDL_RenderPresent(renderer);
 }
 
