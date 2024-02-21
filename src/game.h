@@ -88,14 +88,19 @@ public:
     };
 
     void HandleEvent(const SDL_Event &event) {
-            switch (event.type) {
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_SPACE) player.speed = JUMP_SPEED;
-                if (event.key.keysym.sym == SDLK_ESCAPE) paused = !paused;
-                break;
-            }
-            default: break;
-            }
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+            paused = !paused;
+        }
+
+        if (paused) return;
+
+        switch (event.type) {
+        case SDL_KEYDOWN: {
+            if (event.key.keysym.sym == SDLK_SPACE) player.speed = JUMP_SPEED;
+            break;
+        }
+        default: break;
+        }
     }
     void Update(const double frame_delta) {
         if (paused) return;
