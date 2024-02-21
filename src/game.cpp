@@ -146,6 +146,7 @@ public:
             }
         }
     }
+
     void Draw(Engine *engine) override {
         // Clear the background to white and then draw the game
         SDL_SetRenderDrawColor(engine->renderer, 255, 255, 255, 255);
