@@ -1,5 +1,7 @@
-#pragma once
 #include <cstdlib>
+#include <string>
+#include <SDL2/SDL_ttf.h>
+#include "gamestate.h"
 #include "settings.h"
 
 class Circle {
@@ -74,20 +76,19 @@ public:
     }
 };
 
-class Game {
+class Game final : public GameState {
 public:
-    bool running = true;
     unsigned int score = 0;
 
-    ~Game() {
+    ~Game() override {
         TTF_CloseFont(font);
         if (score_surface != nullptr)
             SDL_FreeSurface(score_surface);
         if (score_texture != nullptr)
             SDL_DestroyTexture(score_texture);
-    };
+    }
 
-    void HandleEvent(const SDL_Event &event) {
+    void HandleEvent(Engine *engine, SDL_Event& event) override {
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
             paused = !paused;
         }
@@ -102,7 +103,8 @@ public:
         default: break;
         }
     }
-    void Update(const double frame_delta) {
+
+    void Update(Engine *engine, double frame_delta) override {
         if (paused) return;
 
         claw_timer += frame_delta;
@@ -123,13 +125,13 @@ public:
 
         // You lose if you go below the bottom border
         if (player.circ.y - player.circ.radius > WINDOW_HEIGHT) {
-            running = false;
+            engine->Quit();
         }
 
         for (Claw& claw: claws) {
             // Check for collision
             if (claw.Collides(player.circ))
-                running = false;
+                engine->Quit();
 
             claw.Move(frame_delta);
         }
@@ -144,11 +146,15 @@ public:
             }
         }
     }
-    void Draw(SDL_Renderer* renderer) {
+    void Draw(Engine *engine) override {
+        // Clear the background to white and then draw the game
+        SDL_SetRenderDrawColor(engine->renderer, 255, 255, 255, 255);
+        SDL_RenderClear(engine->renderer);
+
         for (Claw& claw: claws) {
-            claw.Draw(renderer);
+            claw.Draw(engine->renderer);
         }
-        player.Draw(renderer);
+        player.Draw(engine->renderer);
 
         // Recreate score texture to render only when the score changes
         if (score_surface != nullptr)
@@ -157,9 +163,11 @@ public:
             SDL_DestroyTexture(score_texture);
         score_text = std::to_string(score);
         score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
-        score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
+        score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
         score_rect = {10, 10, score_surface->w, score_surface->h};
-        SDL_RenderCopy(renderer, score_texture, nullptr, &score_rect);
+        SDL_RenderCopy(engine->renderer, score_texture, nullptr, &score_rect);
+
+        SDL_RenderPresent(engine->renderer);
     }
 
 private:

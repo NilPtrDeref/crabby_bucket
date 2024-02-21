@@ -1,74 +1,24 @@
-#include <algorithm>
-#include <iostream>
-#include <vector>
 #define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include "game.h"
-#include "settings.h"
+#include "engine.h"
+#include "gamestate.h"
+#include "game.cpp"
 
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art? (Non-moving background. Yellow bucket with sky at the end.)
 // TODO: Rotation for crab based on speed?
 // TODO: Animations on claws?
 int main() {
-    if (SDL_Init(SDL_INIT_VIDEO)) {
-        std::cerr << "There was an error initializing SDL_video: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-    if (TTF_Init() == -1) {
-        std::cerr << "There was an error initializing SDL_ttf: " << TTF_GetError() << std::endl;
-        return 1;
-    }
+    Engine engine;
+    engine.Init();
 
-    SDL_Window* window = SDL_CreateWindow("Crabby Bucket", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == nullptr) {
-        std::cerr << "There was an error initializing SDL window: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == nullptr) {
-        std::cerr << "There was an error initializing SDL renderer: " << SDL_GetError() << std::endl;
-        return 1;
+    GameState* game = new Game;
+    engine.ChangeState(game);
+    while (engine.Running()) {
+        engine.HandleEvents();
+        engine.Update();
+        engine.Draw();
     }
 
-    Game* game = new Game;
-    SDL_Event event;
-    Uint64 frame_start = SDL_GetPerformanceCounter();
-    bool running = true;
-    while (running) {
-        const Uint64 frame_end = frame_start;
-        frame_start = SDL_GetPerformanceCounter();
-        const double frame_delta = static_cast<double>(frame_start - frame_end) * 1000 / static_cast<double>(SDL_GetPerformanceFrequency());
-
-        if (!game->running) {
-            delete game;
-            game = new Game;
-        }
-
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                running = false;
-                break;
-            }
-            default: game->HandleEvent(event);
-            }
-        }
-
-        game->Update(frame_delta);
-
-        // Clear the background to white and then draw the game
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-        game->Draw(renderer);
-        SDL_RenderPresent(renderer);
-    }
-
-    delete game;
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    TTF_Quit();
-    SDL_Quit();
+    engine.Cleanup();
     return 0;
 }
