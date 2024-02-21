@@ -80,13 +80,10 @@ public:
 class Game final : public GameState {
 public:
     unsigned int score = 0;
+    std::string score_text = "0";
 
     ~Game() override {
         TTF_CloseFont(font);
-        if (score_surface != nullptr)
-            SDL_FreeSurface(score_surface);
-        if (score_texture != nullptr)
-            SDL_DestroyTexture(score_texture);
     }
 
     void HandleEvent(Engine *engine, SDL_Event& event) override {
@@ -155,15 +152,13 @@ public:
         player.Draw(engine->renderer);
 
         // Recreate score texture to render only when the score changes
-        if (score_surface != nullptr)
-            SDL_FreeSurface(score_surface);
-        if (score_texture != nullptr)
-            SDL_DestroyTexture(score_texture);
         score_text = std::to_string(score);
-        score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
-        score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
-        score_rect = {10, 10, score_surface->w, score_surface->h};
+        SDL_Surface* score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
+        SDL_Texture* score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
+        SDL_Rect score_rect = {10, 10, score_surface->w, score_surface->h};
         SDL_RenderCopy(engine->renderer, score_texture, nullptr, &score_rect);
+        SDL_FreeSurface(score_surface);
+        SDL_DestroyTexture(score_texture);
     }
 
 private:
@@ -172,8 +167,4 @@ private:
     double claw_timer = 0.0f;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
-    std::string score_text = "0";
-    SDL_Surface* score_surface = nullptr;
-    SDL_Texture* score_texture = nullptr;
-    SDL_Rect score_rect = {};
 };

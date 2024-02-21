@@ -1,15 +1,18 @@
 #pragma once
+#include "button.h"
 #include "gamestate.h"
+#include "settings.h"
 
 class Pause final : public GameState {
 public:
-    GameState* caller = nullptr;
-
     explicit Pause(GameState* c) {
         caller = c;
     }
-    ~Pause() override = default;
     void HandleEvent(Engine *engine, SDL_Event& event) override;
     void Update(Engine *engine, double frame_delta) override;
     void Draw(Engine *engine) override;
+
+private:
+    GameState* caller = nullptr;
+    Button b = Button("Resume", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 - 50, 200.0f, 100.0f);
 };
