@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "engine.h"
 #include "gamestate.h"
-#include "game.cpp"
+#include "menu.h"
 
 // TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art? (Non-moving background. Yellow bucket with sky at the end.)
@@ -11,8 +11,8 @@ int main() {
     Engine engine;
     engine.Init();
 
-    GameState* game = new Game;
-    engine.ChangeState(game);
+    GameState* menu = new Menu;
+    engine.ChangeState(menu);
     while (engine.Running()) {
         engine.HandleEvents();
         engine.Update();

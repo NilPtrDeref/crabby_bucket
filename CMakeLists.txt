@@ -10,7 +10,10 @@ add_executable(crabby_bucket src/main.cpp
         src/engine.h
         src/pause.cpp
         src/button.cpp
-        src/button.h)
+        src/button.h
+        src/menu.cpp
+        src/menu.h
+        src/game.h)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
