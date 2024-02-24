@@ -13,7 +13,9 @@ add_executable(crabby_bucket src/main.cpp
         src/button.h
         src/menu.cpp
         src/menu.h
-        src/game.h)
+        src/game.h
+        src/gameover.cpp
+        src/gameover.h)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
