@@ -10,5 +10,6 @@ public:
     void Draw(Engine *engine) override;
 
 private:
-    Button b = Button("Start", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 - 50, 200.0f, 100.0f);
+    Button bstart = Button("Start", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 - 150, 200.0f, 100.0f);
+    Button bquit = Button("Quit", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 50, 200.0f, 100.0f);
 };

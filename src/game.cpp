@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <string>
 #include <SDL2/SDL_ttf.h>
+
+#include "gameover.h"
 #include "gamestate.h"
 #include "settings.h"
 #include "pause.h"
@@ -78,14 +80,16 @@ void Game::Update(Engine *engine, double frame_delta) {
 
     // You lose if you go below the bottom border
     if (player.circ.y - player.circ.radius > WINDOW_HEIGHT) {
-        engine->PopState();
+        GameState* gameover = new GameOver(score);
+        engine->PushState(gameover);
         return;
     }
 
     for (Claw& claw: claws) {
         // Check for collision
         if (claw.Collides(player.circ)) {
-            engine->PopState();
+            GameState* gameover = new GameOver(score);
+            engine->PushState(gameover);
             return;
         }
 
@@ -114,7 +118,7 @@ void Game::Draw(Engine *engine) {
     player.Draw(engine->renderer);
 
     // Recreate score texture to render only when the score changes
-    score_text = std::to_string(score);
+    std::string score_text = std::to_string(score);
     SDL_Surface* score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
     SDL_Texture* score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
     SDL_Rect score_rect = {10, 10, score_surface->w, score_surface->h};

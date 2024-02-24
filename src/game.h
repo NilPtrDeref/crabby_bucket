@@ -49,7 +49,6 @@ public:
 class Game final : public GameState {
 public:
     unsigned int score = 0;
-    std::string score_text = "0";
 
     ~Game() override {
         TTF_CloseFont(font);

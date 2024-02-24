@@ -3,7 +3,6 @@
 #include "gamestate.h"
 #include "menu.h"
 
-// TODO: Game loop? (Menu, Gameover screen, Pause menu?)
 // TODO: Art? (Non-moving background. Yellow bucket with sky at the end.)
 // TODO: Rotation for crab based on speed?
 // TODO: Animations on claws?
