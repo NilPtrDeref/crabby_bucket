@@ -14,5 +14,6 @@ public:
 
 private:
     GameState* caller = nullptr;
-    Button b = Button("Resume", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 - 50, 200.0f, 100.0f);
+    Button bresume = Button("Resume", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 - 100, 200.0f, 100.0f);
+    Button bback = Button("Back to Menu", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 50, 200.0f, 100.0f);
 };
