@@ -3,6 +3,7 @@
 #include "settings.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 
 int Engine::Init() {
@@ -12,6 +13,11 @@ int Engine::Init() {
     }
     if (TTF_Init() == -1) {
         std::cerr << "There was an error initializing SDL_ttf: " << TTF_GetError() << std::endl;
+        return 1;
+    }
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        std::cerr << "There was an error initializing SDL_image: " << IMG_GetError() << std::endl;
         return 1;
     }
 
@@ -37,6 +43,7 @@ void Engine::Cleanup() {
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    IMG_Quit();
     TTF_Quit();
     SDL_Quit();
 }

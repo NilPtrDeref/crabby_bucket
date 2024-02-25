@@ -1,4 +1,5 @@
 #pragma once
+#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <string>
 #include "gamestate.h"
@@ -21,7 +22,14 @@ public:
     Circle circ;
     double speed = INITIAL_SPEED;
 
+    ~Player() {
+        SDL_FreeSurface(img);
+    }
+
     void Draw(SDL_Renderer* renderer) const;
+
+private:
+    SDL_Surface* img = IMG_Load("./assets/crab.png");
 };
 
 class Claw {

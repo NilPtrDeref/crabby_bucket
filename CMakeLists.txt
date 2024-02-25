@@ -19,4 +19,5 @@ add_executable(crabby_bucket src/main.cpp
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
-target_link_libraries(crabby_bucket SDL2::SDL2 SDL2_ttf::SDL2_ttf)
+find_package(SDL2_image REQUIRED)
+target_link_libraries(crabby_bucket SDL2::SDL2 SDL2_ttf::SDL2_ttf SDL2_image::SDL2_image)

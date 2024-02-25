@@ -1,5 +1,6 @@
 #include "game.h"
-#include <cstdlib>
+
+#include <assert.h>
 #include <string>
 #include <SDL2/SDL_ttf.h>
 
@@ -9,14 +10,19 @@
 #include "pause.h"
 
 void Player::Draw(SDL_Renderer* renderer) const {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    for (int w = -circ.radius; w < circ.radius; w++) {
-        for (int h = -circ.radius; h < circ.radius; h++) {
-            if (w*w + h*h <= circ.radius*circ.radius) {
-                SDL_RenderDrawPoint(renderer, static_cast<int>(circ.x) + w, static_cast<int>(circ.y) + h);
-            }
-        }
-    }
+    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    // for (int w = -circ.radius; w < circ.radius; w++) {
+    //     for (int h = -circ.radius; h < circ.radius; h++) {
+    //         if (w*w + h*h <= circ.radius*circ.radius) {
+    //             SDL_RenderDrawPoint(renderer, static_cast<int>(circ.x) + w, static_cast<int>(circ.y) + h);
+    //         }
+    //     }
+    // }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
+    SDL_Rect shape{ static_cast<int>(circ.x) - img->w / 2, static_cast<int>(circ.y) - img->h / 2, img->w, img->h };
+    SDL_RenderCopy(renderer, texture, nullptr, &shape);
+    SDL_DestroyTexture(texture);
 }
 
 void Claw::Draw(SDL_Renderer* renderer) const {
