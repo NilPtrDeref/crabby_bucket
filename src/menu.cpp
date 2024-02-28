@@ -3,7 +3,7 @@
 
 void Menu::HandleEvent(Engine *engine, SDL_Event& event) {
     if (event.type == SDL_MOUSEBUTTONDOWN && bstart.MouseIsOver()) {
-        GameState* game = new Game;
+        GameState* game = new Game(engine->renderer);
         engine->PushState(game);
     }
     if (event.type == SDL_MOUSEBUTTONDOWN && bquit.MouseIsOver()) {

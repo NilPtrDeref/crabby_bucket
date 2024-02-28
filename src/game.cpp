@@ -1,9 +1,6 @@
 #include "game.h"
-
-#include <assert.h>
 #include <string>
 #include <SDL2/SDL_ttf.h>
-
 #include "gameover.h"
 #include "gamestate.h"
 #include "settings.h"
@@ -19,16 +16,33 @@ void Player::Draw(SDL_Renderer* renderer) const {
     //     }
     // }
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
-    SDL_Rect shape{ static_cast<int>(circ.x) - img->w / 2, static_cast<int>(circ.y) - img->h / 2, img->w, img->h };
-    SDL_RenderCopy(renderer, texture, nullptr, &shape);
-    SDL_DestroyTexture(texture);
+    int w, h;
+    SDL_QueryTexture(img, nullptr, nullptr, &w, &h);
+    SDL_Rect shape{ static_cast<int>(circ.x) - w / 2, static_cast<int>(circ.y) - h / 2, w, h };
+    SDL_RenderCopy(renderer, img, nullptr, &shape);
 }
 
 void Claw::Draw(SDL_Renderer* renderer) const {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    const SDL_Rect r {static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width), static_cast<int>(rect.height)};
-    SDL_RenderFillRect(renderer, &r);
+    int w, h;
+    SDL_QueryTexture(img, nullptr, nullptr, &w, &h);
+
+    SDL_SetRenderDrawColor(renderer, 223, 62, 35, 255);
+    if (top) {
+        const SDL_Rect r {static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width), static_cast<int>(rect.height)-h};
+        SDL_RenderFillRect(renderer, &r);
+    } else {
+        const SDL_Rect r {static_cast<int>(rect.x), static_cast<int>(rect.y)+h, static_cast<int>(rect.width), static_cast<int>(rect.height)-h};
+        SDL_RenderFillRect(renderer, &r);
+    }
+
+    if (top) {
+        SDL_Rect shape{ static_cast<int>(rect.x)-16, static_cast<int>(rect.height) - h, w, h };
+        auto flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL|SDL_FLIP_VERTICAL);
+        SDL_RenderCopyEx(renderer, img, nullptr, &shape, 0, nullptr, flip);
+    } else {
+        SDL_Rect shape{ static_cast<int>(rect.x)-16, static_cast<int>(rect.y), w, h };
+        SDL_RenderCopyEx(renderer, img, nullptr, &shape, 0, nullptr, SDL_FLIP_HORIZONTAL);
+    }
 }
 
 void Claw::Move(const double delta) {
@@ -70,9 +84,10 @@ void Game::HandleEvent(Engine *engine, SDL_Event& event) {
 void Game::Update(Engine *engine, double frame_delta) {
     claw_timer += frame_delta;
     if (claw_timer > CLAW_INTERVAL_MS) {
-        const Claw r = Claw::Random(CLAW_SPEED);
-        claws.push_back(r);
-        claws.push_back(Claw{r.rect.x, 0.0f, r.rect.width, (WINDOW_HEIGHT-r.rect.height)-GAP_SIZE, CLAW_SPEED});
+        auto t = Claw::Random(CLAW_SPEED, claw_img);
+        auto b = Claw(Rectangle{t.rect.x, 0.0f, t.rect.width, (WINDOW_HEIGHT-t.rect.height)-GAP_SIZE}, CLAW_SPEED, true, claw_img);
+        claws.push_back(b);
+        claws.push_back(t);
         claw_timer = 0.0f;
     }
 

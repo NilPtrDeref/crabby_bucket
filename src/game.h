@@ -21,31 +21,38 @@ class Player {
 public:
     Circle circ;
     double speed = INITIAL_SPEED;
-
-    ~Player() {
-        SDL_FreeSurface(img);
-    }
+    SDL_Texture* img = nullptr;
 
     void Draw(SDL_Renderer* renderer) const;
-
-private:
-    SDL_Surface* img = IMG_Load("./assets/crab.png");
 };
 
 class Claw {
 public:
-    Rectangle rect;
+    Rectangle rect{};
     double speed;
+    bool top = false;
+    SDL_Texture* img = nullptr;
 
-    static Claw Random(const double vel) {
+    Claw(Rectangle r, double s, bool t, SDL_Texture* i) {
+        rect = r;
+        speed = s;
+        top = t;
+        img = i;
+    }
+
+    static Claw Random(const double vel, SDL_Texture* i) {
         double ypos = lerp(MIN_CLAW_Y + GAP_SIZE, WINDOW_HEIGHT - MIN_CLAW_Y - GAP_SIZE, static_cast<double>(rand()) / RAND_MAX);
-        return Claw{
-            static_cast<double>(WINDOW_WIDTH),
-            ypos,
-            CLAW_WIDTH,
-            static_cast<double>(WINDOW_HEIGHT) - ypos,
+        return Claw(
+            Rectangle{
+                static_cast<double>(WINDOW_WIDTH),
+                ypos,
+                CLAW_WIDTH,
+                static_cast<double>(WINDOW_HEIGHT) - ypos,
+            },
             vel,
-        };
+            false,
+            i
+        );
     }
 
     void Draw(SDL_Renderer* renderer) const;
@@ -58,8 +65,16 @@ class Game final : public GameState {
 public:
     unsigned int score = 0;
 
+    explicit Game(SDL_Renderer* renderer):
+    crab_img(IMG_LoadTexture(renderer, "./assets/crab.png")),
+    claw_img(IMG_LoadTexture(renderer, "./assets/claw.png")) {
+        player.img = crab_img;
+    }
+
     ~Game() override {
         TTF_CloseFont(font);
+        SDL_DestroyTexture(crab_img);
+        SDL_DestroyTexture(claw_img);
     }
 
     void HandleEvent(Engine *engine, SDL_Event& event) override;
@@ -72,4 +87,6 @@ private:
     double claw_timer = 0.0f;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
+    SDL_Texture* crab_img;
+    SDL_Texture* claw_img;
 };
