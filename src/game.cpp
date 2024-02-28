@@ -133,6 +133,11 @@ void Game::Draw(Engine *engine) {
     SDL_SetRenderDrawColor(engine->renderer, 255, 255, 255, 255);
     SDL_RenderClear(engine->renderer);
 
+    int w, h;
+    SDL_QueryTexture(bkg_img, nullptr, nullptr, &w, &h);
+    SDL_Rect bgrect{0, 0, w, h};
+    SDL_RenderCopy(engine->renderer, bkg_img, nullptr, &bgrect);
+
     for (Claw& claw: claws) {
         claw.Draw(engine->renderer);
     }

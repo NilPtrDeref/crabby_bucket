@@ -66,6 +66,7 @@ public:
     unsigned int score = 0;
 
     explicit Game(SDL_Renderer* renderer):
+    bkg_img(IMG_LoadTexture(renderer, "./assets/crabby_bkg.png")),
     crab_img(IMG_LoadTexture(renderer, "./assets/crab.png")),
     claw_img(IMG_LoadTexture(renderer, "./assets/claw.png")) {
         player.img = crab_img;
@@ -73,6 +74,7 @@ public:
 
     ~Game() override {
         TTF_CloseFont(font);
+        SDL_DestroyTexture(bkg_img);
         SDL_DestroyTexture(crab_img);
         SDL_DestroyTexture(claw_img);
     }
@@ -87,6 +89,7 @@ private:
     double claw_timer = 0.0f;
 
     TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
+    SDL_Texture* bkg_img;
     SDL_Texture* crab_img;
     SDL_Texture* claw_img;
 };
