@@ -1,0 +1,134 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/button.o",
+      "src/button.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/button.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/button.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/engine.o",
+      "src/engine.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/engine.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/engine.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/game.o",
+      "src/game.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/game.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/game.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/gameover.o",
+      "src/gameover.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/gameover.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/gameover.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/menu.o",
+      "src/menu.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/menu.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/menu.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "-c",
+      "-o",
+      "build/pause.o",
+      "src/pause.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/pause.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/build/pause.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-Wextra",
+      "-std=c++2b",
+      "-g",
+      "-I./src",
+      "-I/usr/include/SDL2",
+      "build/button.o",
+      "build/engine.o",
+      "build/game.o",
+      "build/gameover.o",
+      "build/menu.o",
+      "build/pause.o",
+      "-o",
+      "crabby",
+      "src/main.cpp"
+    ],
+    "directory": "/home/james/CLionProjects/crabby_bucket",
+    "file": "/home/james/CLionProjects/crabby_bucket/src/main.cpp",
+    "output": "/home/james/CLionProjects/crabby_bucket/crabby"
+  }
+]
