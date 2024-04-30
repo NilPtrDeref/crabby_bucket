@@ -5,6 +5,6 @@
 // TODO: Rotation for crab based on speed?
 // TODO: Animations on claws?
 int main() {
-  Engine engine;
+  { Engine engine; }
   return 0;
 }

@@ -20,9 +20,9 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-  CloseWindow();
   while (!states.empty())
     PopState();
+  CloseWindow();
 }
 
 void Engine::ChangeState(GameState *state) {
