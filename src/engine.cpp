@@ -7,6 +7,7 @@
 Engine::Engine() {
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Crabby Bucket");
   SetTargetFPS(60);
+  SetExitKey(0);
 
   GameState *menu = new Menu;
   ChangeState(menu);
