@@ -14,6 +14,9 @@ OBJFILES := $(CPPFILES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 all: $(OBJFILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) $(LDLIBS) $(OBJFILES) src/main.cpp -o $(TARGET)
 
+run: all
+	./$(TARGET)
+
 # To obtain object files
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p build

@@ -3,6 +3,7 @@
 #include "gamestate.h"
 #include "pause.h"
 #include "settings.h"
+#include <cstdio>
 #include <raylib.h>
 #include <string>
 
@@ -22,7 +23,8 @@ void Claw::Draw() const {
   }
 
   if (top) {
-    DrawTextureEx(*img, Vector2{rect.x - 16, rect.height - img->height}, 0.5f, 1, WHITE);
+    // DrawTextureEx(*img, Vector2{rect.x - 16, rect.height - img->height}, 180, 1, WHITE);
+    DrawTextureEx(*img, Vector2{rect.x + 64 - 16, rect.height - 5}, 180, 1, WHITE);
   } else {
     DrawTextureV(*img, Vector2{rect.x - 16, rect.y}, WHITE);
   }
@@ -59,8 +61,7 @@ void Game::Update(Engine *engine, double frame_delta) {
 
   // Move y by velocity and check that velocity is not pushing you past the
   // border
-  // TODO: Figure out why the player isn't moving.
-  player.center.y += static_cast<int>(player.speed * frame_delta);
+  player.center.y += player.speed * frame_delta;
   if (player.center.y - player.radius < 0) {
     player.center.y = 1.0f + player.radius;
     player.speed = 0.0f;
@@ -75,7 +76,6 @@ void Game::Update(Engine *engine, double frame_delta) {
     return;
   }
 
-  // TODO: Figure out why the claws aren't moving.
   for (Claw &claw : claws) {
     // Check for collision
     if (claw.Collides(player.center, player.radius)) {

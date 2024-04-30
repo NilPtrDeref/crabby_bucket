@@ -44,7 +44,7 @@ void Engine::PopState() {
 
 void Engine::Update() {
   GameState *current = states.back();
-  current->Update(this, GetFrameTime());
+  current->Update(this, 1000 * GetFrameTime());
 }
 
 void Engine::Draw() {
