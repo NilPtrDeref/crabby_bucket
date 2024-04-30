@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include <raylib.h>
 
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
@@ -15,4 +15,4 @@ constexpr double CLAW_SPEED = 0.5f;
 constexpr double CLAW_INTERVAL_MS = 850.0f;
 constexpr double GAP_SIZE = 130.0f;
 constexpr double PLAYER_COLUMN = 100.0f;
-constexpr SDL_Color SCORE_COLOR = {0, 0, 0, 255};
+constexpr Color SCORE_COLOR = {0, 0, 0, 255};

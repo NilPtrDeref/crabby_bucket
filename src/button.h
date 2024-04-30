@@ -1,27 +1,26 @@
 #pragma once
-#include <SDL_ttf.h>
+#include <raylib.h>
 #include <string>
 
 class Button {
 public:
-    Button(std::string t, double px, double py, double wi, double he) {
-        text = t;
-        posx = px;
-        posy = py;
-        w = wi;
-        h = he;
-    }
+  Button(std::string t, float px, float py, float wi, float he) {
+    text = t;
+    posx = px;
+    posy = py;
+    w = wi;
+    h = he;
+  }
 
-    ~Button() {
-        TTF_CloseFont(font);
-    }
+  ~Button() { UnloadFont(font); }
 
-    std::string text;
-    double posx, posy, w, h;
+  std::string text;
+  float posx, posy, w, h;
 
-    [[nodiscard]] bool MouseIsOver() const;
-    void Draw(SDL_Renderer *renderer) const;
+  [[nodiscard]] bool MouseIsOver() const;
+  void Draw() const;
 
 private:
-    TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
+  Font font = LoadFont("./assets/dpcomic.ttf");
+  float fontsize = 36;
 };

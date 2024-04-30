@@ -1,35 +1,26 @@
 #include "gameover.h"
-#include "game.h"
-
-void GameOver::HandleEvent(Engine *engine, SDL_Event& event) {
-    if (event.type == SDL_MOUSEBUTTONDOWN && bback.MouseIsOver()) {
-        engine->PopState();
-        engine->PopState();
-    }
-    if (event.type == SDL_MOUSEBUTTONDOWN && bquit.MouseIsOver()) {
-        engine->Quit();
-    }
-}
+#include <raylib.h>
 
 void GameOver::Update(Engine *engine, double frame_delta) {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (bback.MouseIsOver()) {
+      engine->PopState();
+      engine->PopState();
+      return;
+    }
+    if (bquit.MouseIsOver()) {
+      engine->Close = true;
+    }
+  }
 }
 
 void GameOver::Draw(Engine *engine) {
-    // Clear screen
-    SDL_SetRenderDrawColor(engine->renderer, 255, 215, 0, 255);
-    SDL_RenderFillRect(engine->renderer, nullptr);
-
-    // Recreate score texture to render only when the score changes
-    std::string score_text = std::to_string(score);
-    SDL_Surface* score_surface = TTF_RenderText_Solid(font, score_text.c_str(), SCORE_COLOR);
-    SDL_Texture* score_texture = SDL_CreateTextureFromSurface(engine->renderer, score_surface);
-    int xoff = WINDOW_WIDTH/2 - score_surface->w/2;
-    SDL_Rect score_rect = {xoff, WINDOW_HEIGHT/2 - 200, score_surface->w, score_surface->h};
-    SDL_RenderCopy(engine->renderer, score_texture, nullptr, &score_rect);
-    SDL_FreeSurface(score_surface);
-    SDL_DestroyTexture(score_texture);
-
-    // Draw buttons
-    bback.Draw(engine->renderer);
-    bquit.Draw(engine->renderer);
+  DrawRectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color{255, 215, 0, 255});
+  std::string score_text = std::to_string(score);
+  Vector2 size = MeasureTextEx(font, score_text.c_str(), fontsize, 1);
+  DrawTextEx(font, score_text.c_str(),
+             Vector2{WINDOW_WIDTH / 2 - size.x / 2, WINDOW_HEIGHT / 2 - 200}, fontsize, 1,
+             SCORE_COLOR);
+  bback.Draw();
+  bquit.Draw();
 }

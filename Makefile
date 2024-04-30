@@ -1,8 +1,8 @@
 CXX := gcc
 CXXFLAGS := -Wall -Wextra -std=c++2b -g
-INCLUDES := -I./src -I/usr/include/SDL2
+INCLUDES := -I./src
 LDFLAGS := -L/usr/lib
-LDLIBS := -lstdc++ -lSDL2 -lSDL2_image -lSDL2_ttf
+LDLIBS := -lstdc++ -lraylib
 TARGET := crabby
 
 SRCDIR := src

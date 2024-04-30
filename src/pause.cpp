@@ -1,29 +1,31 @@
 #include "pause.h"
-
-void Pause::HandleEvent(Engine *engine, SDL_Event& event) {
-    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
-        engine->PopState();
-    }
-    if (event.type == SDL_MOUSEBUTTONDOWN && bback.MouseIsOver()) {
-        engine->PopState();
-        engine->PopState();
-    }
-    if (event.type == SDL_MOUSEBUTTONDOWN && bresume.MouseIsOver()) {
-        engine->PopState();
-    }
-}
+#include "settings.h"
+#include <raylib.h>
 
 void Pause::Update(Engine *engine, double frame_delta) {
+  if (IsKeyPressed(KEY_ESCAPE)) {
+    engine->PopState();
+    return;
+  }
 
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (bback.MouseIsOver()) {
+      engine->PopState();
+      engine->PopState();
+      return;
+    }
+    if (bresume.MouseIsOver()) {
+      engine->PopState();
+      return;
+    }
+  }
 };
 
 void Pause::Draw(Engine *engine) {
-    if (caller != nullptr) {
-        caller->Draw(engine);
-        SDL_SetRenderDrawColor(engine->renderer, 0, 0, 0, 50);
-        SDL_RenderFillRect(engine->renderer, nullptr);
-
-        bresume.Draw(engine->renderer);
-        bback.Draw(engine->renderer);
-    }
+  if (caller != nullptr) {
+    caller->Draw(engine);
+    DrawRectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color{0, 0, 0, 50});
+    bresume.Draw();
+    bback.Draw();
+  }
 };

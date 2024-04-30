@@ -1,95 +1,82 @@
 #pragma once
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <string>
 #include "gamestate.h"
 #include "settings.h"
+#include <cstdlib>
+#include <raylib.h>
 
-class Circle {
-public:
-    double x = PLAYER_COLUMN;
-    double y = static_cast<double>(WINDOW_HEIGHT) / 2;
-    double radius = RADIUS;
-};
-
-class Rectangle {
-public:
-    double x, y, width, height;
-};
+inline float lerp(float a, float b, float t) { return a + t * (b - a); }
 
 class Player {
 public:
-    Circle circ;
-    double speed = INITIAL_SPEED;
-    SDL_Texture* img = nullptr;
+  Vector2 center;
+  float radius;
+  float speed = INITIAL_SPEED;
+  Texture2D *img = nullptr;
 
-    void Draw(SDL_Renderer* renderer) const;
+  void Draw() const;
 };
 
 class Claw {
 public:
-    Rectangle rect{};
-    double speed;
-    bool top = false;
-    SDL_Texture* img = nullptr;
+  Rectangle rect;
+  float speed;
+  bool top = false;
+  Texture2D *img = nullptr;
 
-    Claw(Rectangle r, double s, bool t, SDL_Texture* i) {
-        rect = r;
-        speed = s;
-        top = t;
-        img = i;
-    }
+  Claw(Rectangle r, float s, bool t, Texture2D *i) {
+    rect = r;
+    speed = s;
+    top = t;
+    img = i;
+  }
 
-    static Claw Random(const double vel, SDL_Texture* i) {
-        double ypos = lerp(MIN_CLAW_Y + GAP_SIZE, WINDOW_HEIGHT - MIN_CLAW_Y - GAP_SIZE, static_cast<double>(rand()) / RAND_MAX);
-        return Claw(
-            Rectangle{
-                static_cast<double>(WINDOW_WIDTH),
-                ypos,
-                CLAW_WIDTH,
-                static_cast<double>(WINDOW_HEIGHT) - ypos,
-            },
-            vel,
-            false,
-            i
-        );
-    }
+  static Claw Random(const double vel, Texture2D *i) {
+    float ypos = lerp(MIN_CLAW_Y + GAP_SIZE, WINDOW_HEIGHT - MIN_CLAW_Y - GAP_SIZE,
+                      static_cast<float>(rand()) / RAND_MAX);
+    return Claw(
+        Rectangle{
+            static_cast<float>(WINDOW_WIDTH),
+            ypos,
+            CLAW_WIDTH,
+            static_cast<float>(WINDOW_HEIGHT) - ypos,
+        },
+        vel, false, i);
+  }
 
-    void Draw(SDL_Renderer* renderer) const;
-    void Move(double delta);
-    [[nodiscard]] bool ShouldDestroy() const;
-    [[nodiscard]] bool Collides(Circle c) const;
+  void Draw() const;
+  void Move(float delta);
+  [[nodiscard]] bool ShouldDestroy() const;
+  [[nodiscard]] bool Collides(Vector2 center, float radius) const;
 };
 
 class Game final : public GameState {
 public:
-    unsigned int score = 0;
+  unsigned int score = 0;
 
-    explicit Game(SDL_Renderer* renderer):
-    bkg_img(IMG_LoadTexture(renderer, "./assets/crabby_bkg.png")),
-    crab_img(IMG_LoadTexture(renderer, "./assets/crab.png")),
-    claw_img(IMG_LoadTexture(renderer, "./assets/claw.png")) {
-        player.img = crab_img;
-    }
+  explicit Game()
+      : bkg_img(LoadTexture("./assets/crabby_bkg.png")), crab_img(LoadTexture("./assets/crab.png")),
+        claw_img(LoadTexture("./assets/claw.png")) {
+    player.img = &crab_img;
+  }
 
-    ~Game() override {
-        TTF_CloseFont(font);
-        SDL_DestroyTexture(bkg_img);
-        SDL_DestroyTexture(crab_img);
-        SDL_DestroyTexture(claw_img);
-    }
+  ~Game() override {
+    UnloadFont(font);
+    UnloadTexture(bkg_img);
+    UnloadTexture(crab_img);
+    UnloadTexture(claw_img);
+  }
 
-    void HandleEvent(Engine *engine, SDL_Event& event) override;
-    void Update(Engine *engine, double frame_delta) override;
-    void Draw(Engine *engine) override;
+  void Update(Engine *engine, double frame_delta) override;
+  void Draw(Engine *engine) override;
 
 private:
-    Player player = Player();
-    std::vector<Claw> claws;
-    double claw_timer = 0.0f;
+  Player player = Player();
+  std::vector<Claw> claws;
+  float claw_timer = 0.0f;
 
-    TTF_Font* font = TTF_OpenFont("./assets/dpcomic.ttf", 36);
-    SDL_Texture* bkg_img;
-    SDL_Texture* crab_img;
-    SDL_Texture* claw_img;
+  Font font = LoadFont("./assets/dpcomic.ttf");
+  float fontsize = 36;
+  Texture2D bkg_img;
+  Texture2D crab_img;
+  Texture2D claw_img;
 };
