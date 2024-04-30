@@ -40,7 +40,7 @@ bool Claw::Collides(Vector2 center, float radius) const {
 
 void Game::Update(Engine *engine, double frame_delta) {
   // Handle key input
-  if (IsKeyPressed(KEY_SPACE))
+  if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_BACKSPACE))
     player.speed = JUMP_SPEED;
   if (IsKeyPressed(KEY_ESCAPE)) {
     GameState *pause = new Pause(this);
