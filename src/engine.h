@@ -5,7 +5,6 @@ class GameState;
 
 class Engine {
 public:
-  int Init();
   Engine();
   ~Engine();
 

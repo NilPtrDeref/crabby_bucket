@@ -12,7 +12,10 @@ Engine::Engine() {
   ChangeState(menu);
   while (!WindowShouldClose() && !Close) {
     Update();
+
+    BeginDrawing();
     Draw();
+    EndDrawing();
   }
 }
 

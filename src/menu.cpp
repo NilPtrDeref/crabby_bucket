@@ -15,6 +15,7 @@ void Menu::Update(Engine *engine, double frame_delta) {
 }
 
 void Menu::Draw(Engine *engine) {
+  DrawRectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color{255, 215, 0, 255});
   bstart.Draw();
   bquit.Draw();
 }
