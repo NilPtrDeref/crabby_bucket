@@ -59,6 +59,7 @@ void Game::Update(Engine *engine, double frame_delta) {
 
   // Move y by velocity and check that velocity is not pushing you past the
   // border
+  // TODO: Figure out why the player isn't moving.
   player.center.y += static_cast<int>(player.speed * frame_delta);
   if (player.center.y - player.radius < 0) {
     player.center.y = 1.0f + player.radius;
@@ -74,6 +75,7 @@ void Game::Update(Engine *engine, double frame_delta) {
     return;
   }
 
+  // TODO: Figure out why the claws aren't moving.
   for (Claw &claw : claws) {
     // Check for collision
     if (claw.Collides(player.center, player.radius)) {

@@ -8,7 +8,7 @@ inline float lerp(float a, float b, float t) { return a + t * (b - a); }
 
 class Player {
 public:
-  Vector2 center;
+  Vector2 center = {PLAYER_COLUMN, WINDOW_HEIGHT / 2};
   float radius;
   float speed = INITIAL_SPEED;
   Texture2D *img = nullptr;
