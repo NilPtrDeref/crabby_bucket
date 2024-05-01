@@ -1,8 +1,8 @@
 CXX := gcc
-CXXFLAGS := -Wall -Wextra -std=c++2b -g
+CXXFLAGS := -Wall -Wextra -g -std=c++2b
 INCLUDES := -I./src
-LDFLAGS := -L/usr/lib
-LDLIBS := -lstdc++ -lraylib
+LDFLAGS := -L./lib
+LDLIBS := -lstdc++ -lraylib -lGL -lm
 TARGET := crabby
 
 SRCDIR := src
@@ -12,7 +12,7 @@ OBJFILES := $(CPPFILES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
 # Default target
 all: $(OBJFILES)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) $(LDLIBS) $(OBJFILES) src/main.cpp -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJFILES) src/main.cpp $(INCLUDES) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
 
 run: all
 	./$(TARGET)

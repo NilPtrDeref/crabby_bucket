@@ -1,6 +1,6 @@
 #include "button.h"
+#include "raylib.h"
 #include "settings.h"
-#include <raylib.h>
 
 Button::Button(std::string t, float px, float py, float wi, float he) {
   text = t;

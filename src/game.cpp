@@ -2,9 +2,9 @@
 #include "gameover.h"
 #include "gamestate.h"
 #include "pause.h"
+#include "raylib.h"
 #include "settings.h"
 #include <cstdio>
-#include <raylib.h>
 #include <string>
 
 void Player::Draw() const {

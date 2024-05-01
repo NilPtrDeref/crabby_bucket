@@ -1,5 +1,5 @@
 #include "gameover.h"
-#include <raylib.h>
+#include "raylib.h"
 
 GameOver::GameOver(unsigned int s) { score = s; }
 

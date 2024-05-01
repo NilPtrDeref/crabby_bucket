@@ -1,6 +1,6 @@
 #include "menu.h"
 #include "game.h"
-#include <raylib.h>
+#include "raylib.h"
 
 void Menu::Update(Engine *engine, float frame_delta) {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

@@ -1,8 +1,8 @@
 #pragma once
 #include "gamestate.h"
+#include "raylib.h"
 #include "settings.h"
 #include <cstdlib>
-#include <raylib.h>
 
 inline float lerp(float a, float b, float t) { return a + t * (b - a); }
 

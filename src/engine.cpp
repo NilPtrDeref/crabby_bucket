@@ -1,8 +1,8 @@
 #include "engine.h"
 #include "gamestate.h"
 #include "menu.h"
+#include "raylib.h"
 #include "settings.h"
-#include <raylib.h>
 
 Engine::Engine() {
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Crabby Bucket");

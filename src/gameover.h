@@ -1,8 +1,8 @@
 #pragma once
 #include "button.h"
 #include "gamestate.h"
+#include "raylib.h"
 #include "settings.h"
-#include <raylib.h>
 
 class GameOver final : public GameState {
 public:

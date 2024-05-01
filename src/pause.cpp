@@ -1,6 +1,6 @@
 #include "pause.h"
+#include "raylib.h"
 #include "settings.h"
-#include <raylib.h>
 
 Pause::Pause(GameState *c) { caller = c; }
 
