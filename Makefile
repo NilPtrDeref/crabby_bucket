@@ -19,8 +19,8 @@ run: all
 
 # To obtain object files
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p build
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) $(LDLIBS) -c $< -o $@
+	@mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 # Clean up
 clean:
