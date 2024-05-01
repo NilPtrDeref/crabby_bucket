@@ -12,20 +12,22 @@ void Player::Draw() const {
               static_cast<int>(center.y) - img->height / 2, WHITE);
 }
 
+Claw::Claw(Rectangle r, float s, bool t, Texture2D *i) {
+  rect = r;
+  speed = s;
+  top = t;
+  img = i;
+}
+
 void Claw::Draw() const {
   if (top) {
     DrawRectangle(static_cast<int>(rect.x), static_cast<int>(rect.y), static_cast<int>(rect.width),
                   static_cast<int>(rect.height) - img->height, Color{223, 62, 35, 255});
+    DrawTextureEx(*img, Vector2{rect.x + 64 - 16, rect.height - 5}, 180, 1, WHITE);
   } else {
     DrawRectangle(static_cast<int>(rect.x), static_cast<int>(rect.y) + img->height,
                   static_cast<int>(rect.width), static_cast<int>(rect.height) - img->height,
                   Color{223, 62, 35, 255});
-  }
-
-  if (top) {
-    // DrawTextureEx(*img, Vector2{rect.x - 16, rect.height - img->height}, 180, 1, WHITE);
-    DrawTextureEx(*img, Vector2{rect.x + 64 - 16, rect.height - 5}, 180, 1, WHITE);
-  } else {
     DrawTextureV(*img, Vector2{rect.x - 16, rect.y}, WHITE);
   }
 }
@@ -38,7 +40,29 @@ bool Claw::Collides(Vector2 center, float radius) const {
   return CheckCollisionCircleRec(center, radius, rect);
 }
 
-void Game::Update(Engine *engine, double frame_delta) {
+Claw RandomClaw(const float vel, Texture2D *i) {
+  float ypos = lerp(MIN_CLAW_Y + GAP_SIZE, WINDOW_HEIGHT - MIN_CLAW_Y - GAP_SIZE,
+                    static_cast<float>(rand()) / RAND_MAX);
+  return Claw(
+      Rectangle{
+          static_cast<float>(WINDOW_WIDTH),
+          ypos,
+          CLAW_WIDTH,
+          static_cast<float>(WINDOW_HEIGHT) - ypos,
+      },
+      vel, false, i);
+}
+
+Game::Game() { player.img = &crab_img; }
+
+Game::~Game() {
+  UnloadFont(font);
+  UnloadTexture(bkg_img);
+  UnloadTexture(crab_img);
+  UnloadTexture(claw_img);
+}
+
+void Game::Update(Engine *engine, float frame_delta) {
   // Handle key input
   if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_BACKSPACE))
     player.speed = JUMP_SPEED;
@@ -50,7 +74,7 @@ void Game::Update(Engine *engine, double frame_delta) {
 
   claw_timer += frame_delta;
   if (claw_timer > CLAW_INTERVAL_MS) {
-    auto t = Claw::Random(CLAW_SPEED, &claw_img);
+    auto t = RandomClaw(CLAW_SPEED, &claw_img);
     auto b = Claw(Rectangle{t.rect.x, 0.0f, t.rect.width,
                             static_cast<float>((WINDOW_HEIGHT - t.rect.height) - GAP_SIZE)},
                   CLAW_SPEED, true, &claw_img);

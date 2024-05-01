@@ -7,11 +7,9 @@ class Engine {
 public:
   Engine();
   ~Engine();
-
   void ChangeState(GameState *state);
   void PushState(GameState *state);
   void PopState();
-
   void Update();
   void Draw();
 

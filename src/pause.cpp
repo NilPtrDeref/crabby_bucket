@@ -2,7 +2,9 @@
 #include "settings.h"
 #include <raylib.h>
 
-void Pause::Update(Engine *engine, double frame_delta) {
+Pause::Pause(GameState *c) { caller = c; }
+
+void Pause::Update(Engine *engine, float frame_delta) {
   if (IsKeyPressed(KEY_ESCAPE)) {
     engine->PopState();
     return;

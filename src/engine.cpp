@@ -42,12 +42,6 @@ void Engine::PopState() {
   states.erase(states.end());
 }
 
-void Engine::Update() {
-  GameState *current = states.back();
-  current->Update(this, 1000 * GetFrameTime());
-}
+void Engine::Update() { states.back()->Update(this, 1000 * GetFrameTime()); }
 
-void Engine::Draw() {
-  GameState *current = states.back();
-  current->Draw(this);
-}
+void Engine::Draw() { states.back()->Draw(this); }

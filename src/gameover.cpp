@@ -1,7 +1,11 @@
 #include "gameover.h"
 #include <raylib.h>
 
-void GameOver::Update(Engine *engine, double frame_delta) {
+GameOver::GameOver(unsigned int s) { score = s; }
+
+GameOver::~GameOver() { UnloadFont(font); }
+
+void GameOver::Update(Engine *engine, float frame_delta) {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     if (bback.MouseIsOver()) {
       engine->PopState();
